@@ -19,8 +19,8 @@ body {
 }
 aside {
     float: right;
-    margin: 0 2em 2em 1em;
-    width: 40em;
+    margin: 0 0em 2em 1em;
+    width: auto;
 }
 aside h2 {
     display: block;

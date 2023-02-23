@@ -124,7 +124,7 @@ roles.forEach(async (role) => {
   let protocolClient = await createProtocolClient();
   agents[role] = {connection, agentClient, protocolClient}
 
-  if ((role == PUBLIC_ISSUER) || (role == PRIVATE_ISSUER)) {
+  if ((role == PUBLIC_ISSUER) || (role == PRIVATE_ISSUER) || (role == UNIVERSITY)) {
     console.log(`Needs to create crendential definition id for schema ${schemaId} and role ${role}`)
     const id = await createCredDef(schemaId, agentClient)
     agents[role].credDefId = id
@@ -133,19 +133,46 @@ roles.forEach(async (role) => {
 
   await agentClient.startListeningWithHandler({
     DIDExchangeDone: async (info) => {
-      connectionId = info.connectionId
+      let connectionId = info.connectionId
       console.log(`New connection: ${connectionId} for role ${role}`)
       if (role == PUBLIC_ISSUER) {
         const credentials = await createCredentials(JOB_ATTR, agents[PUBLIC_ISSUER].credDefId, ['Government grant application handler', 'Secretary'])
-        const result = await protocolClient.sendCredentialOffer(connectionId, credential)    
+        credentials.forEach(async (credential) => {
+          console.log('Issued ')
+          const result = await protocolClient.sendCredentialOffer(connectionId, credential)
+        })
       }
       if (role == PRIVATE_ISSUER) {
-        const credentials = await createCredentials(JOB_ATTR, agents[PRIVATE_ISSUER].credDefId, ['Government grant application handler', 'Secretary'])
-        const result = await protocolClient.sendCredentialOffer(connectionId, credential)    
+        const credentials = await createCredentials(JOB_ATTR, agents[PRIVATE_ISSUER].credDefId, ['Summer trainee', 'Customer Care Manager'])
+        credentials.forEach(async (credential) => {
+          const result = await protocolClient.sendCredentialOffer(connectionId, credential)
+        })
       }
       if (role == UNIVERSITY) {
         const credentials = await createCredentials(DEGREE_ATTR, agents[UNIVERSITY].credDefId, ['Bachelor of Engineering', 'Master of Science'])
-        const result = await protocolClient.sendCredentialOffer(connectionId, credential)
+        credentials.forEach(async (credential) => {
+          const result = await protocolClient.sendCredentialOffer(connectionId, credential)
+        })
+      }
+      if (role == COMPANY) {
+        const degAttributes = new agencyv1.Protocol.Proof()
+        const degAttr = new agencyv1.Protocol.Proof.Attribute()
+        degAttr.setName(DEGREE_ATTR)
+        //degAttr.setCredDefid(credDefId)
+        degAttributes.addAttributes(degAttr)
+        const degreeRequest = new agencyv1.Protocol.PresentProofMsg()
+        degreeRequest.setAttributes(degAttributes)
+        await protocolClient.sendProofRequest(connectionId, degreeRequest)
+      
+        const jobAttributes = new agencyv1.Protocol.Proof()
+        const jobAttr = new agencyv1.Protocol.Proof.Attribute()
+        jobAttr.setName(JOB_ATTR)
+        //jobAttr.setCredDefid(credDefId)
+        jobAttributes.addAttributes(jobAttr)
+        const jobRequest = new agencyv1.Protocol.PresentProofMsg()
+        jobRequest.setAttributes(jobAttributes)
+        await agents[COMPANY].protocolClient.sendProofRequest(connectionId, jobRequest)
+      
       }
     },
     IssueCredentialDone: (info) => {
@@ -278,35 +305,27 @@ const renderInvitation = async (role, res) => {
 }
 
 app.get('/publicservicepositions', async (req, res) => {
-  console.log('issuing public service position credential...')
+  console.log('issuing public service position credentials...')
   renderInvitation(PUBLIC_ISSUER, res)
+})
+
+app.get('/privateemploymentperiods', async (req, res) => {
+  console.log('issuing private job credentials...')
+  renderInvitation(PRIVATE_ISSUER, res)
+})
+
+app.get('/universitydegrees', async (req, res) => {
+  console.log('issuing university degree credentials...')
+  renderInvitation(UNIVERSITY, res)
 })
 
 app.get('/apply', async (req, res) => {
   console.log('displaying application form...')
   const msg = new agencyv1.InvitationBase()
-  msg.setLabel(common.agencyProps.userName)
-  const invitation = await agentClient.createInvitation(msg)
+  msg.setLabel(COMPANY)
+  const invitation = await agents[COMPANY].agentClient.createInvitation(msg)
   const invitationURL = invitation.getUrl()
   const qrcode = await QRCode.toDataURL(invitationURL)
   res.render('applicationForm', {qrcode, invitationURL})
-
-  const degAttributes = new agencyv1.Protocol.Proof()
-  const degAttr = new agencyv1.Protocol.Proof.Attribute()
-  degAttr.setName(DEGREE_ATTR)
-  //degAttr.setCredDefid(credDefId)
-  degAttributes.addAttributes(degAttr)
-  const degreeRequest = new agencyv1.Protocol.PresentProofMsg()
-  degreeRequest.setAttributes(degAttributes)
-  await protocolClient.sendProofRequest(connectionId, degreeRequest)
-
-  const jobAttributes = new agencyv1.Protocol.Proof()
-  const jobAttr = new agencyv1.Protocol.Proof.Attribute()
-  jobAttr.setName(JOB_ATTR)
-  //jobAttr.setCredDefid(credDefId)
-  jobAttributes.addAttributes(jobAttr)
-  const jobRequest = new agencyv1.Protocol.PresentProofMsg()
-  jobRequest.setAttributes(jobAttributes)
-  await protocolClient.sendProofRequest(connectionId, jobRequest)
 
 })
