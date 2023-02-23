@@ -1,0 +1,32 @@
+doctype html
+html
+ head
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(name='apple-mobile-web-app-capable' content='yes')
+  meta(name='HandheldFriendly' content='True')
+  meta(name='MobileOptimized' content='width')
+  title Apply
+  link(rel='stylesheet' type='text/css' href='/style.css')
+ body
+  h1 Apply
+  aside
+   h2 Connect your wallet
+   img(src=qrcode, title='Scan code with your wallet')
+   textarea#invitation(cols="46", rows="12")= invitationURL
+   button#copy Copy to clipboard
+  form#form
+   fieldset
+    legend Applicant
+    label(for='email') Email
+    input#email(name='email' type='email' required)
+   fieldset
+    legend Education
+    label(for='degree1') Degree
+    input#degree1(name='degree1' type='text' required)
+   fieldset
+    legend Work experience
+    label(for='degree1') Job
+    input#job1(name='job1' type='text' required)
+   fieldset
+    input#Apply(type='submit' value='Apply')
+  script(src='/applicationForm.js')

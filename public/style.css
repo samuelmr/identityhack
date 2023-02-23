@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap'); */
+:root {
+    --background-base-hue: 210; /* HSL hue degrees */
+    --background-base-saturation: 55%;
+    --background-base-lightness: 90%;
+}
+body {
+    background-color: hsl(var(--background-base-hue), var(--background-base-saturation), var(--background-base-lightness));
+    background: linear-gradient(209deg, hsl(var(--background-base-hue), var(--background-base-saturation), var(--background-base-lightness)), hsl(var(--background-base-hue), var(--background-base-saturation), calc(0.85 * var(--background-base-lightness))));
+    background-attachment: fixed;
+    height: 200vh;
+    /* font-family: 'Roboto Slab', serif; */
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.5;
+}
+.hidden {
+    display: none;
+}
+aside {
+    float: right;
+    margin: 0 2em 2em 1em;
+    width: 40em;
+}
+aside h2 {
+    display: block;
+}
+aside img {
+    border: 1px outset #666;
+}
+aside button {
+    display: block;
+}
+fieldset {
+    border-width: 0;
+    margin: 0 0 1em 0;
+    padding: 0;
+}
+legend {
+    font-size: larger;
+    font-weight: 300;
+}
+label {
+    display: block;
+}

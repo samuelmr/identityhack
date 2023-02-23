@@ -1,0 +1,14 @@
+{
+  "name": "seuranta-issuer",
+  "type": "module",
+  "scripts": {
+    "start": "PATH=./node_modules/.bin:$PATH node server.js"
+  },
+  "dependencies": {
+    "@findy-network/findy-common-ts": "^0.2.6",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "pug": "^3.0.2",
+    "qrcode": "^1.5.1"
+  }
+}
